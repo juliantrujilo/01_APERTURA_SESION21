@@ -1,0 +1,890 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sesión 21: React, Componentes y JSX | SENA ADSO</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&family=Syne:wght@700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --sena-verde: #39a900;
+  --sena-verde-dark: #2d8400;
+  --sena-verde-glow: rgba(57,169,0,0.10);
+  --sena-verde-border: rgba(57,169,0,0.30);
+  --sena-naranja: #ff6b00;
+  --sena-naranja-glow: rgba(255,107,0,0.10);
+  --sena-naranja-border: rgba(255,107,0,0.30);
+  --texto: #1a1a2e;
+  --texto-dim: rgba(26,26,46,0.62);
+  --texto-dimmer: rgba(26,26,46,0.38);
+  --bg: #f8fafc;
+  --bg-alt: #f4f7f2;
+  --borde: #e2e8f0;
+  --acento-azul: #3b82f6;
+  --acento-azul-glow: rgba(59,130,246,0.10);
+  --acento-purpura: #8b5cf6;
+  --acento-purpura-glow: rgba(139,92,246,0.10);
+  --alerta-amarillo: #f59e0b;
+  --alerta-amarillo-glow: rgba(245,158,11,0.10);
+  --alerta-rojo: #ef4444;
+  --alerta-rojo-glow: rgba(239,68,68,0.10);
+  --acento-teal: #0ea5e9;
+  --acento-teal-glow: rgba(14,165,233,0.10);
+  --acento-teal-border: rgba(14,165,233,0.30);
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+body { font-family:'Inter',sans-serif; color:var(--texto); background:var(--bg); line-height:1.6; overflow-x:hidden; }
+
+.topbar { position:sticky; top:0; z-index:100; background:rgba(255,255,255,0.95); backdrop-filter:blur(16px); border-bottom:2px solid var(--sena-verde); padding:12px 32px; display:flex; align-items:center; justify-content:space-between; box-shadow:0 2px 12px var(--sena-verde-glow); }
+.topbar-left { display:flex; align-items:center; gap:16px; }
+.sena-logo { background:var(--sena-verde); color:#fff; font-weight:900; font-size:18px; padding:8px 16px; border-radius:8px; letter-spacing:1px; }
+.topbar-brand { font-family:'Syne',sans-serif; font-size:15px; font-weight:700; color:var(--sena-verde-dark); }
+.topbar-sub { font-size:12px; color:var(--texto-dimmer); margin-top:2px; display:none; }
+@media(min-width:600px){ .topbar-sub{display:block;} }
+.topbar-nav { display:none; gap:4px; flex-wrap:wrap; }
+@media(min-width:900px){ .topbar-nav{display:flex;} }
+.topbar-nav a { color:var(--texto-dim); text-decoration:none; font-size:11px; font-weight:600; padding:6px 14px; border-radius:20px; border:1px solid transparent; transition:all .25s; white-space:nowrap; }
+.topbar-nav a:hover { color:var(--sena-verde-dark); border-color:var(--sena-verde-border); background:var(--sena-verde-glow); }
+
+.slide { min-height:100vh; padding:80px 48px; position:relative; scroll-margin-top:64px; border-bottom:1px solid var(--borde); }
+.slide.bg-alt { background:var(--bg-alt); }
+.slide.bg-verde { background:linear-gradient(135deg, var(--sena-verde-glow) 0%, #ffffff 60%); }
+.slide.bg-azul  { background:linear-gradient(135deg, var(--acento-azul-glow) 0%, #ffffff 60%); }
+.slide.bg-teal  { background:linear-gradient(135deg, var(--acento-teal-glow) 0%, #ffffff 60%); }
+.slide-inner { max-width:1200px; margin:0 auto; }
+.slide-num-badge { position:absolute; top:24px; right:24px; background:var(--sena-verde-glow); color:var(--sena-verde); font-size:11px; font-weight:700; padding:6px 12px; border-radius:20px; letter-spacing:1px; border:1px solid var(--sena-verde-border); }
+
+.bg-dots { position:absolute; inset:0; background-image:radial-gradient(var(--sena-verde-border) 1px, transparent 1px); background-size:28px 28px; pointer-events:none; opacity:0.35; }
+.bg-glow { position:absolute; width:600px; height:600px; border-radius:50%; filter:blur(120px); opacity:0.22; pointer-events:none; z-index:0; }
+.bg-glow.g1 { background:radial-gradient(circle, var(--sena-verde-glow), transparent 70%); top:-200px; left:-200px; }
+.bg-glow.g2 { background:radial-gradient(circle, var(--sena-naranja-glow), transparent 70%); bottom:-200px; right:-200px; }
+
+.portada-tag { display:inline-flex; align-items:center; gap:8px; background:var(--sena-verde-glow); border:1px solid var(--sena-verde-border); padding:10px 20px; border-radius:30px; font-size:12px; font-weight:700; color:var(--sena-verde-dark); letter-spacing:1.5px; margin-bottom:32px; position:relative; z-index:1; }
+.portada-tag .dot { width:6px; height:6px; background:var(--sena-verde); border-radius:50%; animation:blink 1.5s ease-in-out infinite; }
+@keyframes blink { 0%,100%{opacity:1;} 50%{opacity:0.3;} }
+.portada-titulo { font-family:'Syne',sans-serif; font-size:clamp(40px,7vw,68px); font-weight:800; line-height:1.1; margin-bottom:20px; color:var(--texto); position:relative; z-index:1; }
+.portada-titulo .linea2 { display:block; background:linear-gradient(135deg, var(--acento-teal), var(--acento-azul)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+.portada-titulo .linea3 { display:block; background:linear-gradient(135deg, var(--sena-naranja), var(--acento-purpura)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+.portada-desc { font-size:clamp(15px,2vw,18px); color:var(--texto-dim); max-width:680px; margin-bottom:40px; position:relative; z-index:1; line-height:1.7; }
+.portada-meta { display:flex; gap:16px; flex-wrap:wrap; position:relative; z-index:1; }
+.portada-meta-item { background:rgba(255,255,255,0.9); border:1px solid var(--borde); padding:10px 20px; border-radius:12px; font-size:14px; font-weight:600; color:var(--texto-dim); }
+
+.sec-header { margin-bottom:40px; position:relative; z-index:1; }
+.sec-tag { display:inline-block; font-size:11px; font-weight:700; padding:6px 14px; border-radius:20px; letter-spacing:1.2px; margin-bottom:14px; text-transform:uppercase; border:1px solid transparent; }
+.sec-tag.verde   { background:var(--sena-verde-glow); color:var(--sena-verde); border-color:var(--sena-verde-border); }
+.sec-tag.naranja { background:var(--sena-naranja-glow); color:var(--sena-naranja); border-color:var(--sena-naranja-border); }
+.sec-tag.azul    { background:var(--acento-azul-glow); color:var(--acento-azul); border-color:rgba(59,130,246,0.30); }
+.sec-tag.purpura { background:var(--acento-purpura-glow); color:var(--acento-purpura); border-color:rgba(139,92,246,0.30); }
+.sec-tag.amarillo{ background:var(--alerta-amarillo-glow); color:var(--alerta-amarillo); border-color:rgba(245,158,11,0.30); }
+.sec-tag.teal    { background:var(--acento-teal-glow); color:var(--acento-teal); border-color:var(--acento-teal-border); }
+.sec-titulo { font-family:'Syne',sans-serif; font-size:clamp(28px,4vw,42px); font-weight:800; color:var(--texto); margin-bottom:12px; line-height:1.2; }
+.sec-desc { font-size:clamp(15px,1.8vw,17px); color:var(--texto-dim); max-width:800px; line-height:1.7; }
+
+.info-box { border-radius:12px; padding:20px 24px; margin:20px 0; border-left:4px solid; position:relative; z-index:1; }
+.info-box.tip     { background:var(--sena-verde-glow); border-color:var(--sena-verde); }
+.info-box.warning { background:var(--alerta-amarillo-glow); border-color:var(--alerta-amarillo); }
+.info-box.danger  { background:var(--alerta-rojo-glow); border-color:var(--alerta-rojo); }
+.info-box.info    { background:var(--acento-azul-glow); border-color:var(--acento-azul); }
+.info-box.teal    { background:var(--acento-teal-glow); border-color:var(--acento-teal); }
+.info-box.purpura { background:var(--acento-purpura-glow); border-color:var(--acento-purpura); }
+.info-box-title   { font-weight:700; font-size:14px; margin-bottom:8px; }
+.info-box.tip     .info-box-title { color:var(--sena-verde-dark); }
+.info-box.warning .info-box-title { color:#92400e; }
+.info-box.danger  .info-box-title { color:#991b1b; }
+.info-box.info    .info-box-title { color:#1e40af; }
+.info-box.teal    .info-box-title { color:#0369a1; }
+.info-box.purpura .info-box-title { color:#5b21b6; }
+.info-box-content { font-size:14px; color:var(--texto-dim); line-height:1.7; }
+
+.concepto-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(240px,1fr)); gap:20px; position:relative; z-index:1; margin-bottom:28px; }
+.concepto-card { background:#fff; border:2px solid var(--borde); border-radius:16px; padding:24px; }
+.concepto-icon  { font-size:36px; margin-bottom:12px; }
+.concepto-titulo{ font-family:'Syne',sans-serif; font-size:16px; font-weight:800; color:var(--texto); margin-bottom:6px; }
+.concepto-desc  { font-size:13px; color:var(--texto-dim); line-height:1.6; }
+.concepto-card.verde   { border-color:var(--sena-verde-border); background:var(--sena-verde-glow); }
+.concepto-card.azul    { border-color:rgba(59,130,246,0.25); background:var(--acento-azul-glow); }
+.concepto-card.teal    { border-color:var(--acento-teal-border); background:var(--acento-teal-glow); }
+.concepto-card.purpura { border-color:rgba(139,92,246,0.25); background:var(--acento-purpura-glow); }
+.concepto-card.naranja { border-color:var(--sena-naranja-border); background:var(--sena-naranja-glow); }
+.concepto-card.amarillo{ border-color:rgba(245,158,11,0.30); background:var(--alerta-amarillo-glow); }
+
+.tabla-wrap { overflow-x:auto; position:relative; z-index:1; margin:20px 0; }
+table { width:100%; border-collapse:collapse; font-size:14px; }
+th { background:var(--sena-verde); color:#fff; padding:12px 16px; text-align:left; font-weight:700; }
+th:first-child { border-radius:8px 0 0 0; } th:last-child { border-radius:0 8px 0 0; }
+td { padding:12px 16px; border-bottom:1px solid var(--borde); vertical-align:top; }
+tr:nth-child(even) td { background:var(--bg-alt); }
+tr:hover td { background:var(--sena-verde-glow); }
+
+.paso-lista { display:flex; flex-direction:column; gap:0; position:relative; z-index:1; }
+.paso-item { display:flex; gap:24px; padding:28px 0; border-bottom:1px solid var(--borde); }
+.paso-item:last-child { border-bottom:none; }
+.paso-num { flex-shrink:0; width:44px; height:44px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-family:'Syne',sans-serif; font-size:18px; font-weight:800; color:#fff; }
+.paso-num.verde   { background:var(--sena-verde); }
+.paso-num.azul    { background:var(--acento-azul); }
+.paso-num.teal    { background:var(--acento-teal); }
+.paso-num.purpura { background:var(--acento-purpura); }
+.paso-num.naranja { background:var(--sena-naranja); }
+.paso-body { flex:1; }
+.paso-titulo { font-family:'Syne',sans-serif; font-size:18px; font-weight:800; color:var(--texto); margin-bottom:6px; }
+.paso-desc { font-size:14px; color:var(--texto-dim); line-height:1.7; margin-bottom:12px; }
+
+.entregable-box { background:linear-gradient(135deg, var(--sena-verde-glow), var(--acento-teal-glow)); border:2px solid var(--sena-verde-border); border-radius:16px; padding:28px 32px; position:relative; z-index:1; margin-top:32px; }
+.entregable-title { font-family:'Syne',sans-serif; font-size:20px; font-weight:800; color:var(--sena-verde-dark); margin-bottom:16px; }
+.entregable-list { list-style:none; display:flex; flex-direction:column; gap:10px; }
+.entregable-list li { display:flex; align-items:flex-start; gap:10px; font-size:14px; color:var(--texto); }
+.entregable-list li::before { content:'✅'; flex-shrink:0; }
+
+.roadmap-grid { display:grid; grid-template-columns:repeat(3, 1fr); gap:22px; position:relative; z-index:1; margin-bottom:8px; }
+@media(max-width:900px){ .roadmap-grid{ grid-template-columns:1fr; } }
+.roadmap-card { background:#fff; border:2px solid var(--borde); border-radius:18px; padding:28px 24px 24px; position:relative; overflow:hidden; transition:transform .2s, box-shadow .2s; }
+.roadmap-card:hover { transform:translateY(-4px); box-shadow:0 16px 32px rgba(14,165,233,.14); border-color:var(--acento-teal-border); }
+.roadmap-num { position:absolute; top:-6px; right:4px; font-family:'Syne',sans-serif; font-size:72px; font-weight:800; color:var(--acento-teal); opacity:.10; line-height:1; pointer-events:none; }
+.roadmap-icon { font-size:34px; margin-bottom:14px; }
+.roadmap-tag { display:inline-block; font-family:'JetBrains Mono',monospace; font-size:10.5px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--acento-teal); background:var(--acento-teal-glow); border:1px solid var(--acento-teal-border); padding:4px 10px; border-radius:20px; margin-bottom:12px; }
+.roadmap-titulo { font-family:'Syne',sans-serif; font-size:18px; font-weight:800; color:var(--texto); margin-bottom:10px; line-height:1.25; }
+.roadmap-desc { font-size:13px; color:var(--texto-dim); line-height:1.65; }
+
+/* ── RAP cards — competencia y resultados de aprendizaje ── */
+.rap-grid { display:grid; grid-template-columns:repeat(3, 1fr); gap:20px; position:relative; z-index:1; margin-bottom:8px; }
+@media(max-width:900px){ .rap-grid{ grid-template-columns:1fr; } }
+.rap-card { background:#fff; border-radius:18px; padding:0; overflow:hidden; border:2px solid var(--borde); position:relative; transition:transform .2s, box-shadow .2s; }
+.rap-card:hover { transform:translateY(-4px); box-shadow:0 18px 36px rgba(0,0,0,.09); }
+.rap-card-bar { height:6px; width:100%; }
+.rap-card.done .rap-card-bar { background:linear-gradient(90deg, var(--sena-verde), #6bd44e); }
+.rap-card.active .rap-card-bar { background:linear-gradient(90deg, var(--acento-teal), var(--acento-azul)); }
+.rap-card.pending .rap-card-bar { background:linear-gradient(90deg, var(--acento-teal), #7dd3fc); opacity:.6; }
+.rap-card.active { border-color:var(--acento-teal); box-shadow:0 0 0 4px var(--acento-teal-glow), 0 18px 36px rgba(14,165,233,.14); }
+.rap-card-body { padding:28px 26px 26px; }
+.rap-card-top { display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:18px; }
+.rap-card-icon { font-size:42px; line-height:1; }
+.rap-card-status { font-size:11px; font-weight:800; letter-spacing:.05em; text-transform:uppercase; padding:5px 12px; border-radius:20px; white-space:nowrap; }
+.rap-card.done .rap-card-status { background:var(--sena-verde-glow); color:var(--sena-verde-dark); }
+.rap-card.active .rap-card-status { background:var(--acento-teal-glow); color:#0369a1; }
+.rap-card.pending .rap-card-status { background:var(--acento-teal-glow); color:#0369a1; opacity:.8; }
+.rap-card-id { font-family:'JetBrains Mono',monospace; font-size:12px; font-weight:700; letter-spacing:.08em; color:var(--texto-dimmer); margin-bottom:6px; text-transform:uppercase; }
+.rap-card-titulo { font-family:'Syne',sans-serif; font-size:21px; font-weight:800; color:var(--texto); margin-bottom:12px; line-height:1.2; }
+.rap-card-desc { font-size:13.5px; color:var(--texto-dim); line-height:1.6; }
+.rap-card.active .rap-card-icon { animation: rapPulse 1.8s ease-in-out infinite; }
+@keyframes rapPulse { 0%,100%{ transform:scale(1); } 50%{ transform:scale(1.12); } }
+
+.footer-nav { position:fixed; bottom:0; left:0; right:0; z-index:90; background:rgba(255,255,255,0.95); backdrop-filter:blur(16px); border-top:2px solid var(--sena-verde); padding:14px 32px; display:flex; align-items:center; justify-content:space-between; }
+.footer-btn { background:var(--sena-verde); color:#fff; border:none; padding:10px 24px; border-radius:8px; font-weight:700; font-size:14px; cursor:pointer; transition:all .2s; }
+.footer-btn:hover { background:var(--sena-verde-dark); transform:translateY(-1px); }
+.footer-btn:disabled { opacity:0.4; cursor:not-allowed; transform:none; }
+.footer-page { font-size:13px; font-weight:600; color:var(--texto-dim); }
+
+.code-editor { background:#1a1a2e; border-radius:14px; overflow:hidden; box-shadow:0 20px 50px rgba(0,0,0,.25); display:flex; flex-direction:column; }
+.code-editor-header { background:#12121f; padding:10px 16px; display:flex; align-items:center; gap:8px; }
+.term-dot { width:11px; height:11px; border-radius:50%; }
+.term-dot.r { background:#ff5f57; } .term-dot.y { background:#febc2e; } .term-dot.g { background:#28c840; }
+.code-editor-title { margin-left:8px; font-family:'JetBrains Mono',monospace; font-size:11px; color:#8892a4; flex:1; }
+.code-editor-body { padding:14px 0; font-family:'JetBrains Mono',monospace; font-size:12.5px; line-height:1.85; flex:1; overflow-x:auto; }
+.cl { display:grid; grid-template-columns:24px 1fr; column-gap:10px; padding:0 18px; white-space:pre; }
+.cl .ln { color:#4a5178; user-select:none; text-align:right; }
+.cl .code { color:#e2e8f0; }
+.indent-1 .code { padding-left:18px; }
+.cm { color:#565f89; font-style:italic; }
+.sel { color:#7dcfff; }
+.prop { color:#9ece6a; }
+.val { color:#e2e8f0; }
+.tag { color:#f7768e; }
+.attr { color:#e0af68; }
+.str { color:#9ece6a; }
+.punc { color:#8892a4; }
+
+/* Comparación Virtual DOM */
+.dom-compare { display:grid; grid-template-columns:1fr auto 1fr; gap:20px; align-items:center; margin:24px 0; position:relative; z-index:1; }
+@media(max-width:900px){ .dom-compare{ grid-template-columns:1fr; } }
+.dom-box { background:#fff; border:2px solid var(--borde); border-radius:16px; padding:22px; }
+.dom-box.mal { border-color:rgba(239,68,68,.3); background:var(--alerta-rojo-glow); }
+.dom-box.bien { border-color:var(--sena-verde-border); background:var(--sena-verde-glow); }
+.dom-box-title { font-family:'Syne',sans-serif; font-weight:800; font-size:15px; margin-bottom:10px; }
+.dom-box-desc { font-size:13px; color:var(--texto-dim); line-height:1.6; }
+.dom-vs { font-family:'Syne',sans-serif; font-weight:800; font-size:16px; color:var(--texto-dimmer); text-align:center; }
+
+.sec-tag.rojo { background:var(--alerta-rojo-glow); color:var(--alerta-rojo); border-color:rgba(239,68,68,0.30); }
+
+/* Demo animada — Virtual DOM */
+.dom-demo-wrap { max-width:640px; margin:0 auto 24px; position:relative; z-index:1; }
+.dom-demo-label { font-family:'JetBrains Mono',monospace; font-size:12px; font-weight:700; color:var(--texto-dim); margin-bottom:12px; text-align:center; }
+.dom-demo-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; background:#fff; border:2px solid var(--borde); border-radius:16px; padding:20px; }
+.dom-demo-card { height:70px; border-radius:10px; background:var(--borde); }
+.dom-demo-caption { text-align:center; font-size:12.5px; color:var(--texto-dim); margin-top:10px; }
+
+#demo-dom-viejo .dom-demo-card { animation: domParpadeo 1.6s ease-in-out infinite; }
+#demo-dom-viejo .dom-demo-card:nth-child(1){ animation-delay:0s; }
+#demo-dom-viejo .dom-demo-card:nth-child(2){ animation-delay:.05s; }
+#demo-dom-viejo .dom-demo-card:nth-child(3){ animation-delay:.1s; }
+#demo-dom-viejo .dom-demo-card:nth-child(4){ animation-delay:.15s; }
+#demo-dom-viejo .dom-demo-card:nth-child(5){ animation-delay:.2s; }
+#demo-dom-viejo .dom-demo-card:nth-child(6){ animation-delay:.25s; }
+@keyframes domParpadeo {
+  0%, 100% { background:var(--borde); opacity:1; transform:scale(1); }
+  40% { background:var(--alerta-rojo); opacity:.25; transform:scale(.93); }
+  60% { background:var(--alerta-rojo); opacity:.25; transform:scale(.93); }
+}
+
+#demo-dom-react .dom-demo-card.highlight { animation: domHighlight 1.6s ease-in-out infinite; }
+@keyframes domHighlight {
+  0%, 100% { background:var(--borde); box-shadow:none; }
+  50% { background:var(--sena-verde); box-shadow:0 0 0 4px var(--sena-verde-glow); }
+}
+
+@media(max-width:768px){ .slide{padding:60px 24px;} .topbar{padding:10px 20px;} }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-left">
+    <div class="sena-logo">SENA</div>
+    <div>
+      <div class="topbar-brand">ADSO · Construcción de Software</div>
+      <div class="topbar-sub">Ficha 3229944 · Garzón, Huila</div>
+    </div>
+  </div>
+  <nav class="topbar-nav">
+    <a href="#portada">Inicio</a>
+    <a href="#competencia">Competencia</a>
+    <a href="#plan">Plan</a>
+    <a href="#logros">Logros</a>
+    <a href="#que-es-react">¿Qué es React?</a>
+    <a href="#problema-dom">El problema (S05)</a>
+    <a href="#virtual-dom">Virtual DOM</a>
+    <a href="#jsx">JSX</a>
+    <a href="#componentes">Componentes</a>
+    <a href="#prerequisitos">Prerequisitos</a>
+    <a href="#entregable">Entregable</a>
+  </nav>
+</div>
+
+<!-- ══════════ SLIDE 1 — PORTADA ══════════ -->
+<section class="slide" id="portada">
+  <div class="bg-dots"></div>
+  <div class="bg-glow g1"></div>
+  <div class="bg-glow g2"></div>
+  <div class="slide-inner" style="position:relative;z-index:1;">
+    <div class="portada-tag"><span class="dot"></span> SESIÓN 21 · FASE 5 REACT Y TAILWIND CSS</div>
+    <h1 class="portada-titulo">
+      TechStore Pro<br>
+      <span class="linea2">¿Qué es React?</span>
+      <span class="linea3">Componentes y JSX</span>
+    </h1>
+    <p class="portada-desc">
+      Con Tailwind ya dominado (S19-S20), hoy cambia la herramienta, no el objetivo: seguimos construyendo la misma interfaz de TechStore Pro, pero con React de verdad. Cierra el Bloque A y arranca el Bloque B — 6 sesiones de fundamentos antes de empezar a migrar páginas completas.
+    </p>
+    <div class="portada-meta">
+      <div class="portada-meta-item">📅 Sesión 21 de 44</div>
+      <div class="portada-meta-item">⚛️ Componentes y JSX</div>
+      <div class="portada-meta-item">🧠 Virtual DOM</div>
+      <div class="portada-meta-item">🗂️ Fase 5 — React y Tailwind</div>
+    </div>
+  </div>
+  <span class="slide-num-badge">01 / 14</span>
+</section>
+
+<!-- ══════════ SLIDE 2 — COMPETENCIA Y RESULTADOS DE APRENDIZAJE ══════════ -->
+<section class="slide bg-alt" id="competencia">
+  <div class="slide-inner">
+    <div class="sec-header">
+      <span class="sec-tag purpura">Marco de formación</span>
+      <h2 class="sec-titulo">Competencia 220501096</h2>
+      <p class="sec-desc">Construcción del software de acuerdo con el diseño establecido. Todo lo que hacemos en esta fase construye evidencia real para estos 5 Resultados de Aprendizaje.</p>
+    </div>
+
+    <div class="rap-grid">
+      <div class="rap-card done">
+        <div class="rap-card-bar"></div>
+        <div class="rap-card-body">
+          <div class="rap-card-top">
+            <span class="rap-card-icon">🗺️</span>
+            <span class="rap-card-status">✅ Cerrado</span>
+          </div>
+          <div class="rap-card-id">RAP1</div>
+          <div class="rap-card-titulo">Planear</div>
+          <div class="rap-card-desc">Planear actividades de construcción según el diseño establecido.</div>
+        </div>
+      </div>
+
+      <div class="rap-card done">
+        <div class="rap-card-bar"></div>
+        <div class="rap-card-body">
+          <div class="rap-card-top">
+            <span class="rap-card-icon">🗄️</span>
+            <span class="rap-card-status">✅ Cerrado</span>
+          </div>
+          <div class="rap-card-id">RAP2</div>
+          <div class="rap-card-titulo">Base de datos</div>
+          <div class="rap-card-desc">Construir la base de datos a partir del modelo de datos. Cerrado en Fase 3.</div>
+        </div>
+      </div>
+
+      <div class="rap-card active">
+        <div class="rap-card-bar"></div>
+        <div class="rap-card-body">
+          <div class="rap-card-top">
+            <span class="rap-card-icon">🧩</span>
+            <span class="rap-card-status">🟡 Hoy</span>
+          </div>
+          <div class="rap-card-id">RAP3</div>
+          <div class="rap-card-titulo">Componentes front-end</div>
+          <div class="rap-card-desc">Crear componentes front-end de acuerdo con el diseño. En curso — Fase 5.</div>
+        </div>
+      </div>
+
+      <div class="rap-card pending">
+        <div class="rap-card-bar"></div>
+        <div class="rap-card-body">
+          <div class="rap-card-top">
+            <span class="rap-card-icon">💻</span>
+            <span class="rap-card-status">🟡 En curso</span>
+          </div>
+          <div class="rap-card-id">RAP4</div>
+          <div class="rap-card-titulo">Codificar</div>
+          <div class="rap-card-desc">Codificar el software según el diseño establecido. Backend listo, frontend en migración.</div>
+        </div>
+      </div>
+
+      <div class="rap-card pending">
+        <div class="rap-card-bar"></div>
+        <div class="rap-card-body">
+          <div class="rap-card-top">
+            <span class="rap-card-icon">🧪</span>
+            <span class="rap-card-status">🟡 En curso</span>
+          </div>
+          <div class="rap-card-id">RAP5</div>
+          <div class="rap-card-titulo">Pruebas</div>
+          <div class="rap-card-desc">Realizar pruebas para verificar la funcionalidad. Evidencia en cada sesión.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="info-box tip" style="margin-top:20px;">
+      <div class="info-box-title">📍 Dónde estamos hoy</div>
+      <div class="info-box-content">La Sesión 21 aporta evidencia directa a <strong>RAP3</strong> (primer componente real de React, separado en su propio archivo) y <strong>RAP4</strong> (código nuevo aplicado sobre <code style="font-family:'JetBrains Mono',monospace;font-size:12px;">frontend-react/</code>) — hoy el componente deja de ser solo HTML con clases y pasa a ser una función de JavaScript real.</div>
+    </div>
+  </div>
+  <span class="slide-num-badge">02 / 14</span>
+</section>
+
+<!-- ══════════ SLIDE 3 — PLAN ══════════ -->
+<section class="slide" id="plan">
+  <div class="slide-inner">
+    <div class="sec-header">
+      <span class="sec-tag naranja">Agenda</span>
+      <h2 class="sec-titulo">Plan de la sesión</h2>
+      <p class="sec-desc">240 minutos para entender qué es React de verdad y sacar el primer componente propio.</p>
+    </div>
+
+    <div class="roadmap-grid">
+      <div class="roadmap-card">
+        <div class="roadmap-num">1</div>
+        <div class="roadmap-icon">🎬</div>
+        <div class="roadmap-tag">0–30 min</div>
+        <div class="roadmap-titulo">Apertura</div>
+        <div class="roadmap-desc">Qué es React, Virtual DOM (idea, no implementación), sintaxis JSX y sus reglas.</div>
+      </div>
+      <div class="roadmap-card">
+        <div class="roadmap-num">2</div>
+        <div class="roadmap-icon">🧩</div>
+        <div class="roadmap-tag">30–100 min</div>
+        <div class="roadmap-titulo">Concepto de componente</div>
+        <div class="roadmap-desc">Qué es un componente en React, por qué App.jsx ya es uno, diferencia con una función cualquiera.</div>
+      </div>
+      <div class="roadmap-card">
+        <div class="roadmap-num">3</div>
+        <div class="roadmap-icon">✂️</div>
+        <div class="roadmap-tag">100–190 min</div>
+        <div class="roadmap-titulo">Primer componente separado</div>
+        <div class="roadmap-desc">Sacar el navbar de App.jsx y crear Navbar.jsx como componente propio, en su propio archivo.</div>
+      </div>
+      <div class="roadmap-card">
+        <div class="roadmap-num">4</div>
+        <div class="roadmap-icon">🔌</div>
+        <div class="roadmap-tag">190–220 min</div>
+        <div class="roadmap-titulo">Importar y usar el componente</div>
+        <div class="roadmap-desc">import/export, usar &lt;Navbar /&gt; dentro de App.jsx como si fuera una etiqueta HTML normal.</div>
+      </div>
+      <div class="roadmap-card">
+        <div class="roadmap-num">5</div>
+        <div class="roadmap-icon">🏁</div>
+        <div class="roadmap-tag">220–240 min</div>
+        <div class="roadmap-titulo">Cierre</div>
+        <div class="roadmap-desc">Revisión de entregables y vista previa de la Sesión 22 — props y componentes reutilizables.</div>
+      </div>
+    </div>
+  </div>
+  <span class="slide-num-badge">03 / 14</span>
+</section>
+
+<!-- ══════════ SLIDE 4 — LOGROS ══════════ -->
+<section class="slide bg-teal" id="logros">
+  <div class="slide-inner">
+    <div class="sec-header">
+      <span class="sec-tag teal">Objetivos</span>
+      <h2 class="sec-titulo">¿Qué vamos a lograr?</h2>
+      <p class="sec-desc">Al terminar la sesión, TechStore Pro tendrá su primer componente de React real, separado en su propio archivo.</p>
+    </div>
+
+    <div class="roadmap-grid">
+      <div class="roadmap-card">
+        <div class="roadmap-num">01</div>
+        <div class="roadmap-icon">🧠</div>
+        <div class="roadmap-tag">Concepto</div>
+        <div class="roadmap-titulo">Entender qué es un componente</div>
+        <div class="roadmap-desc">Componente = función de JavaScript que devuelve JSX. Ya venimos usando uno sin saberlo: App.jsx.</div>
+      </div>
+      <div class="roadmap-card">
+        <div class="roadmap-num">02</div>
+        <div class="roadmap-icon">✂️</div>
+        <div class="roadmap-tag">Separación</div>
+        <div class="roadmap-titulo">Navbar.jsx como archivo propio</div>
+        <div class="roadmap-desc">El navbar sale de App.jsx y se convierte en su primer componente hijo real.</div>
+      </div>
+      <div class="roadmap-card">
+        <div class="roadmap-num">03</div>
+        <div class="roadmap-icon">🔌</div>
+        <div class="roadmap-tag">Composición</div>
+        <div class="roadmap-titulo">App.jsx usa &lt;Navbar /&gt;</div>
+        <div class="roadmap-desc">App.jsx pasa a ensamblar componentes en vez de contener todo el código directamente.</div>
+      </div>
+    </div>
+  </div>
+  <span class="slide-num-badge">04 / 14</span>
+</section>
+
+<!-- ══════════ SLIDE 5 — ¿QUÉ ES REACT? ══════════ -->
+<section class="slide bg-azul" id="que-es-react">
+  <div class="slide-inner">
+    <div class="sec-header">
+      <span class="sec-tag azul">Concepto</span>
+      <h2 class="sec-titulo">¿Qué es React, exactamente?</h2>
+      <p class="sec-desc">Hasta hoy usamos React de forma indirecta — Vite lo instaló, pero todo lo que escribimos (navbar, tarjetas, footer) fue HTML con clases Tailwind. React es la librería que <strong>construye</strong> ese HTML de forma dinámica, a partir de código JavaScript.</p>
+    </div>
+
+    <div class="concepto-grid">
+      <div class="concepto-card azul">
+        <div class="concepto-icon">📚</div>
+        <div class="concepto-titulo">Una librería, no un lenguaje</div>
+        <div class="concepto-desc">React es JavaScript — no es un lenguaje nuevo. Es un conjunto de herramientas para construir interfaces sin escribir manualmente <code style="font-family:'JetBrains Mono',monospace;font-size:11px;">document.createElement()</code> una y otra vez.</div>
+      </div>
+      <div class="concepto-card verde">
+        <div class="concepto-icon">🧩</div>
+        <div class="concepto-titulo">Todo se arma con componentes</div>
+        <div class="concepto-desc">En vez de un solo HTML gigante, la interfaz se divide en piezas pequeñas y reutilizables — cada una es un componente.</div>
+      </div>
+      <div class="concepto-card teal">
+        <div class="concepto-icon">🔄</div>
+        <div class="concepto-titulo">Actualiza solo lo que cambia</div>
+        <div class="concepto-desc">Cuando algo cambia en pantalla (ej. un contador), React no recarga toda la página — actualiza solo esa parte. Esto se explica en el siguiente slide (Virtual DOM).</div>
+      </div>
+    </div>
+
+    <div class="info-box tip">
+      <div class="info-box-title">✅ Lo que ya sabíamos, con otro nombre</div>
+      <div class="info-box-content"><code style="font-family:'JetBrains Mono',monospace;font-size:12px;">function App() { return (...) }</code> ya es un componente de React — lo escribimos desde S19 sin llamarlo así todavía. Hoy le ponemos nombre a lo que ya veníamos haciendo, y aprendemos a crear un segundo.</div>
+    </div>
+
+    <div class="info-box info">
+      <div class="info-box-title">💡 ¿Hay que instalar React hoy?</div>
+      <div class="info-box-content">No — ya está instalado desde S19. Cuando corrimos <code style="font-family:'JetBrains Mono',monospace;font-size:12px;">npm create vite@latest frontend-react -- --template react</code>, esa plantilla <code style="font-family:'JetBrains Mono',monospace;font-size:12px;">--template react</code> ya agregó React como dependencia en <code style="font-family:'JetBrains Mono',monospace;font-size:12px;">package.json</code>, junto con Vite. Por eso <code style="font-family:'JetBrains Mono',monospace;font-size:12px;">App.jsx</code> ya era un componente de React desde el primer día — solo lo usábamos únicamente para escribir HTML con clases Tailwind, sin aprovechar nada más. Hoy es la primera vez que usamos React de verdad.</div>
+    </div>
+  </div>
+  <span class="slide-num-badge">05 / 14</span>
+</section>
+
+<!-- ══════════ SLIDE 6 — EL PROBLEMA (ANCLADO A S05) ══════════ -->
+<section class="slide" id="problema-dom">
+  <div class="slide-inner">
+    <div class="sec-header">
+      <span class="sec-tag rojo">Recordando S05</span>
+      <h2 class="sec-titulo">El patrón que ya usamos... y su costo oculto</h2>
+      <p class="sec-desc">En la <strong>Sesión 5</strong> (Fase 2, JavaScript y el DOM) construimos el buscador de productos con este patrón — reemplazar TODO el contenido cada vez que algo cambia:</p>
+    </div>
+
+    <div class="code-editor" style="max-width:680px;margin:0 auto 20px;">
+      <div class="code-editor-header">
+        <div class="term-dot r"></div><div class="term-dot y"></div><div class="term-dot g"></div>
+        <div class="code-editor-title">S05 — main.js (código real que ya escribiste)</div>
+      </div>
+      <div class="code-editor-body">
+        <div class="cl"><span class="ln">1</span><span class="code"><span class="cm">// Cada vez que el usuario escribe en el buscador...</span></span></div>
+        <div class="cl"><span class="ln">2</span><span class="code"><span class="prop">const</span> gridTarjetas = document.<span class="sel">querySelector</span>(<span class="str">'#grid-tarjetas'</span>);</span></div>
+        <div class="cl"><span class="ln">3</span><span class="code"></span></div>
+        <div class="cl"><span class="ln">4</span><span class="code"><span class="tag">gridTarjetas</span>.innerHTML = productos.<span class="sel">map</span>(crearTarjeta).<span class="sel">join</span>(<span class="str">''</span>);</span></div>
+      </div>
+    </div>
+
+    <div class="info-box danger">
+      <div class="info-box-title">❌ Lo que realmente pasa en esa línea 4</div>
+      <div class="info-box-content">Aunque solo cambie el texto de <strong>una</strong> tarjeta (ej. el usuario filtra y quedan 5 de 6), <code style="font-family:'JetBrains Mono',monospace;font-size:12px;">.innerHTML =</code> <strong>borra las 6 tarjetas completas del DOM real</strong> y las vuelve a crear desde cero — imágenes, botones, textos, todo. El navegador tiene que recalcular estilos y volver a pintar las 6, no solo la 1 que cambió.</div>
+    </div>
+
+    <div class="dom-demo-wrap">
+      <div class="dom-demo-label">🔴 Simulación — cada vez que escribes en el buscador de S05</div>
+      <div class="dom-demo-grid" id="demo-dom-viejo">
+        <div class="dom-demo-card"></div>
+        <div class="dom-demo-card"></div>
+        <div class="dom-demo-card"></div>
+        <div class="dom-demo-card"></div>
+        <div class="dom-demo-card"></div>
+        <div class="dom-demo-card"></div>
+      </div>
+      <div class="dom-demo-caption">Las 6 tarjetas <strong>parpadean todas</strong> — se destruyen y se vuelven a crear, aunque solo 1 tuviera que cambiar.</div>
+    </div>
+
+    <div class="info-box warning">
+      <div class="info-box-title">⚠️ Esto no estuvo "mal" en S05</div>
+      <div class="info-box-content">Para 6 tarjetas es imperceptible — por eso funcionaba perfecto. El problema aparece cuando la interfaz crece: cientos de elementos, actualizaciones frecuentes (un contador, un chat, un formulario con validación en vivo). Ahí ese "recrear todo" sí se nota, y es exactamente el problema que resuelve el Virtual DOM.</div>
+    </div>
+  </div>
+  <span class="slide-num-badge">06 / 14</span>
+</section>
+
+<!-- ══════════ SLIDE 7 — LA SOLUCIÓN: VIRTUAL DOM ══════════ -->
+<section class="slide bg-verde" id="virtual-dom">
+  <div class="slide-inner">
+    <div class="sec-header">
+      <span class="sec-tag verde">Concepto</span>
+      <h2 class="sec-titulo">Virtual DOM — la idea, no la implementación</h2>
+      <p class="sec-desc">No vamos a programar el Virtual DOM — React lo hace por nosotros. Pero entender la idea explica por qué React resuelve el problema del slide anterior.</p>
+    </div>
+
+    <div class="dom-demo-wrap">
+      <div class="dom-demo-label">🟢 El mismo cambio, pero con React</div>
+      <div class="dom-demo-grid" id="demo-dom-react">
+        <div class="dom-demo-card"></div>
+        <div class="dom-demo-card"></div>
+        <div class="dom-demo-card highlight"></div>
+        <div class="dom-demo-card"></div>
+        <div class="dom-demo-card"></div>
+        <div class="dom-demo-card"></div>
+      </div>
+      <div class="dom-demo-caption">Solo la tarjeta que realmente cambió se actualiza — las otras 5 <strong>ni se tocan</strong>.</div>
+    </div>
+
+    <div class="dom-compare">
+      <div class="dom-box mal">
+        <div class="dom-box-title">❌ Patrón de S05</div>
+        <div class="dom-box-desc"><code style="font-family:'JetBrains Mono',monospace;font-size:12px;">innerHTML =</code> reemplaza TODO el contenido del contenedor — no hay forma de decirle "solo cambia esta parte".</div>
+      </div>
+      <div class="dom-vs">VS</div>
+      <div class="dom-box bien">
+        <div class="dom-box-title">✅ Con Virtual DOM (React)</div>
+        <div class="dom-box-desc">React mantiene una copia ligera del DOM en memoria. Cuando algo cambia, compara la copia vieja con la nueva, calcula la diferencia mínima, y solo actualiza <strong>esa parte</strong> en el DOM real.</div>
+      </div>
+    </div>
+
+    <div class="info-box info">
+      <div class="info-box-title">💡 Analogía simple</div>
+      <div class="info-box-content">Es como editar un documento: en vez de reimprimir todo el documento cada vez que cambias una palabra, solo corriges esa palabra en la hoja ya impresa. El Virtual DOM es el "borrador" donde React calcula qué cambió antes de tocar la página real.</div>
+    </div>
+
+    <div class="info-box warning">
+      <div class="info-box-title">⚠️ No se programa manualmente</div>
+      <div class="info-box-content">El Virtual DOM es interno de React — nunca vamos a escribir código que lo maneje directamente, ni un <code style="font-family:'JetBrains Mono',monospace;font-size:12px;">querySelector</code> como en S05. Solo hace falta entender que existe y por qué React puede actualizar la pantalla sin recargar la página completa.</div>
+    </div>
+  </div>
+  <span class="slide-num-badge">07 / 14</span>
+</section>
+
+<!-- ══════════ SLIDE 8 — JSX ══════════ -->
+<section class="slide bg-teal" id="jsx">
+  <div class="slide-inner">
+    <div class="sec-header">
+      <span class="sec-tag teal">Concepto</span>
+      <h2 class="sec-titulo">JSX — HTML dentro de JavaScript</h2>
+      <p class="sec-desc">Ya venimos escribiendo JSX desde S19 sin saber su nombre — es la sintaxis que mezcla HTML con JavaScript dentro de un componente.</p>
+    </div>
+
+    <div class="code-editor" style="max-width:640px;margin:0 auto 24px;">
+      <div class="code-editor-header">
+        <div class="term-dot r"></div><div class="term-dot y"></div><div class="term-dot g"></div>
+        <div class="code-editor-title">Esto que ya escribimos ES JSX</div>
+      </div>
+      <div class="code-editor-body">
+        <div class="cl"><span class="ln">1</span><span class="code"><span class="prop">function</span> <span class="sel">App</span>() {</span></div>
+        <div class="cl indent-1"><span class="ln">2</span><span class="code"><span class="prop">return</span> (</span></div>
+        <div class="cl indent-1"><span class="ln">3</span><span class="code">  <span class="punc">&lt;</span><span class="tag">nav</span> <span class="attr">className</span>=<span class="str">"flex ..."</span><span class="punc">&gt;</span></span></div>
+        <div class="cl indent-1"><span class="ln">4</span><span class="code">    TechStore Pro</span></div>
+        <div class="cl indent-1"><span class="ln">5</span><span class="code">  <span class="punc">&lt;/</span><span class="tag">nav</span><span class="punc">&gt;</span></span></div>
+        <div class="cl indent-1"><span class="ln">6</span><span class="code">)</span></div>
+        <div class="cl"><span class="ln">7</span><span class="code">}</span></div>
+      </div>
+    </div>
+
+    <div class="tabla-wrap">
+      <table>
+        <thead><tr><th>Regla de JSX</th><th>Por qué</th></tr></thead>
+        <tbody>
+          <tr><td>Un único elemento raíz por <code style="font-family:'JetBrains Mono',monospace;font-size:12px;">return</code></td><td>Por eso S19 usó <code style="font-family:'JetBrains Mono',monospace;font-size:12px;">&lt;&gt;...&lt;/&gt;</code> — JSX no permite devolver dos elementos sueltos</td></tr>
+          <tr><td><code style="font-family:'JetBrains Mono',monospace;font-size:12px;">className</code> en vez de <code style="font-family:'JetBrains Mono',monospace;font-size:12px;">class</code></td><td><code style="font-family:'JetBrains Mono',monospace;font-size:12px;">class</code> es palabra reservada en JavaScript — JSX usa el nombre de la propiedad real del DOM</td></tr>
+          <tr><td>Etiquetas siempre se cierran</td><td><code style="font-family:'JetBrains Mono',monospace;font-size:12px;">&lt;img /&gt;</code>, no <code style="font-family:'JetBrains Mono',monospace;font-size:12px;">&lt;img&gt;</code> — a diferencia del HTML normal</td></tr>
+          <tr><td><code style="font-family:'JetBrains Mono',monospace;font-size:12px;">{ }</code> para JavaScript dentro del HTML</td><td>Cualquier variable o expresión se escribe entre llaves — lo usaremos desde S22 en adelante</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <span class="slide-num-badge">08 / 14</span>
+</section>
+
+<!-- ══════════ SLIDE 9 — COMPONENTES ══════════ -->
+<section class="slide bg-alt" id="componentes">
+  <div class="slide-inner">
+    <div class="sec-header">
+      <span class="sec-tag verde">Concepto</span>
+      <h2 class="sec-titulo">Un componente es una función que devuelve JSX</h2>
+      <p class="sec-desc">Esa es toda la definición. Un componente de React no es más que una función de JavaScript normal, con dos reglas simples.</p>
+    </div>
+
+    <div class="concepto-grid">
+      <div class="concepto-card verde">
+        <div class="concepto-icon">🔠</div>
+        <div class="concepto-titulo">Empieza con mayúscula</div>
+        <div class="concepto-desc"><code style="font-family:'JetBrains Mono',monospace;font-size:11px;">function Navbar()</code>, no <code style="font-family:'JetBrains Mono',monospace;font-size:11px;">function navbar()</code> — así React distingue un componente de una etiqueta HTML normal.</div>
+      </div>
+      <div class="concepto-card verde">
+        <div class="concepto-icon">↩️</div>
+        <div class="concepto-titulo">Devuelve JSX</div>
+        <div class="concepto-desc">Su <code style="font-family:'JetBrains Mono',monospace;font-size:11px;">return</code> siempre entrega HTML mezclado con JavaScript — nunca un número o texto suelto.</div>
+      </div>
+    </div>
+
+    <div class="dom-compare" style="grid-template-columns:1fr 1fr;">
+      <div class="dom-box mal">
+        <div class="dom-box-title">Hoy — todo en un archivo</div>
+        <div class="dom-box-desc"><code style="font-family:'JetBrains Mono',monospace;font-size:12px;">App.jsx</code> contiene el navbar, el catálogo y el footer, todos mezclados en el mismo <code style="font-family:'JetBrains Mono',monospace;font-size:12px;">return</code>.</div>
+      </div>
+      <div class="dom-box bien">
+        <div class="dom-box-title">Después de hoy — separado</div>
+        <div class="dom-box-desc"><code style="font-family:'JetBrains Mono',monospace;font-size:12px;">Navbar.jsx</code> vive en su propio archivo. <code style="font-family:'JetBrains Mono',monospace;font-size:12px;">App.jsx</code> lo importa y lo usa como <code style="font-family:'JetBrains Mono',monospace;font-size:12px;">&lt;Navbar /&gt;</code>.</div>
+      </div>
+    </div>
+
+    <div class="info-box tip">
+      <div class="info-box-title">✅ La idea clave de hoy</div>
+      <div class="info-box-content">Un componente se usa dentro de otro escribiéndolo como si fuera una etiqueta HTML: <code style="font-family:'JetBrains Mono',monospace;font-size:12px;">&lt;Navbar /&gt;</code>. React lo reconoce como componente (no como HTML) porque empieza con mayúscula — es la misma regla del slide anterior.</div>
+    </div>
+  </div>
+  <span class="slide-num-badge">09 / 14</span>
+</section>
+
+<!-- ══════════ SLIDE 10 — IMPORT/EXPORT ══════════ -->
+<section class="slide" id="import-export">
+  <div class="slide-inner">
+    <div class="sec-header">
+      <span class="sec-tag azul">Concepto</span>
+      <h2 class="sec-titulo">Cómo se conectan dos archivos: import / export</h2>
+      <p class="sec-desc">Ya usamos <code style="font-family:'JetBrains Mono',monospace;">export default App</code> desde S19 sin explicarlo a fondo. Hoy hace falta entenderlo, porque vamos a crear un segundo archivo que se conecta con el primero.</p>
+    </div>
+
+    <div class="code-editor" style="max-width:680px;margin:0 auto 20px;">
+      <div class="code-editor-header">
+        <div class="term-dot r"></div><div class="term-dot y"></div><div class="term-dot g"></div>
+        <div class="code-editor-title">src/Navbar.jsx (nuevo archivo)</div>
+      </div>
+      <div class="code-editor-body">
+        <div class="cl"><span class="ln">1</span><span class="code"><span class="prop">function</span> <span class="sel">Navbar</span>() {</span></div>
+        <div class="cl indent-1"><span class="ln">2</span><span class="code">  <span class="prop">return</span> <span class="punc">&lt;</span><span class="tag">nav</span><span class="punc">&gt;</span>...<span class="punc">&lt;/</span><span class="tag">nav</span><span class="punc">&gt;</span></span></div>
+        <div class="cl"><span class="ln">3</span><span class="code">}</span></div>
+        <div class="cl"><span class="ln">4</span><span class="code"></span></div>
+        <div class="cl"><span class="ln">5</span><span class="code"><span class="prop">export default</span> Navbar <span class="cm">// "este archivo entrega Navbar"</span></span></div>
+      </div>
+    </div>
+
+    <div class="code-editor" style="max-width:680px;margin:0 auto;">
+      <div class="code-editor-header">
+        <div class="term-dot r"></div><div class="term-dot y"></div><div class="term-dot g"></div>
+        <div class="code-editor-title">src/App.jsx</div>
+      </div>
+      <div class="code-editor-body">
+        <div class="cl"><span class="ln">1</span><span class="code"><span class="prop">import</span> Navbar <span class="prop">from</span> <span class="str">'./Navbar.jsx'</span> <span class="cm">// "traigo lo que exportó ese archivo"</span></span></div>
+        <div class="cl"><span class="ln">2</span><span class="code"></span></div>
+        <div class="cl"><span class="ln">3</span><span class="code"><span class="prop">function</span> <span class="sel">App</span>() {</span></div>
+        <div class="cl indent-1"><span class="ln">4</span><span class="code">  <span class="prop">return</span> <span class="punc">&lt;</span><span class="tag">Navbar</span> <span class="punc">/&gt;</span> <span class="cm">{/* se usa como etiqueta */}</span></span></div>
+        <div class="cl"><span class="ln">5</span><span class="code">}</span></div>
+      </div>
+    </div>
+  </div>
+  <span class="slide-num-badge">10 / 14</span>
+</section>
+
+<!-- ══════════ SLIDE 11 — PREREQUISITOS ══════════ -->
+<section class="slide bg-alt" id="prerequisitos">
+  <div class="slide-inner">
+    <div class="sec-header">
+      <span class="sec-tag amarillo">Antes de empezar</span>
+      <h2 class="sec-titulo">Prerequisitos</h2>
+      <p class="sec-desc">Todo lo de hoy se construye sobre lo que ya existe de S19–S20 — no hay instalación nueva.</p>
+    </div>
+
+    <div class="concepto-grid">
+      <div class="concepto-card verde">
+        <div class="concepto-icon">✅</div>
+        <div class="concepto-titulo">frontend-react/ funcionando</div>
+        <div class="concepto-desc">Vite + Tailwind ya instalados desde S19, corriendo en <code style="font-family:'JetBrains Mono',monospace;font-size:11px;">localhost:5173</code> sin errores.</div>
+      </div>
+      <div class="concepto-card verde">
+        <div class="concepto-icon">✅</div>
+        <div class="concepto-titulo">Layout con &lt;main&gt; real</div>
+        <div class="concepto-desc">El contenedor de S20 (<code style="font-family:'JetBrains Mono',monospace;font-size:11px;">max-w-6xl mx-auto...</code>) sigue en <code style="font-family:'JetBrains Mono',monospace;font-size:11px;">App.jsx</code> — hoy no se toca.</div>
+      </div>
+      <div class="concepto-card verde">
+        <div class="concepto-icon">✅</div>
+        <div class="concepto-titulo">Catálogo responsive</div>
+        <div class="concepto-desc">El grid de productos de S20 sigue funcionando — hoy solo se mueve el navbar a su propio archivo.</div>
+      </div>
+      <div class="concepto-card naranja">
+        <div class="concepto-icon">📁</div>
+        <div class="concepto-titulo">Se crea un archivo nuevo</div>
+        <div class="concepto-desc"><code style="font-family:'JetBrains Mono',monospace;font-size:11px;">src/Navbar.jsx</code> — el primer archivo de componente propio del proyecto, además de <code style="font-family:'JetBrains Mono',monospace;font-size:11px;">App.jsx</code>.</div>
+      </div>
+    </div>
+
+    <div class="info-box warning">
+      <div class="info-box-title">⚠️ No hace falta reinstalar nada</div>
+      <div class="info-box-content">React ya está instalado desde que Vite creó el proyecto en S19 (es la plantilla <code style="font-family:'JetBrains Mono',monospace;font-size:12px;">--template react</code>) — hoy es la primera vez que lo usamos de forma consciente, creando un componente propio.</div>
+    </div>
+  </div>
+  <span class="slide-num-badge">11 / 14</span>
+</section>
+
+<!-- ══════════ SLIDE 12 — RESUMEN DE CONCEPTOS NUEVOS ══════════ -->
+<section class="slide" id="resumen-conceptos">
+  <div class="slide-inner">
+    <div class="sec-header">
+      <span class="sec-tag purpura">Referencia rápida</span>
+      <h2 class="sec-titulo">Los conceptos nuevos de hoy</h2>
+      <p class="sec-desc">Todo lo de S19-S20 (Tailwind, breakpoints, layout) sigue funcionando igual — esto es lo que se suma hoy.</p>
+    </div>
+
+    <div class="tabla-wrap">
+      <table>
+        <thead><tr><th>Concepto</th><th>Qué significa</th></tr></thead>
+        <tbody>
+          <tr><td>Componente</td><td>Función de JavaScript, con nombre en mayúscula, que devuelve JSX</td></tr>
+          <tr><td>JSX</td><td>Sintaxis que mezcla HTML con JavaScript dentro de un componente</td></tr>
+          <tr><td>Virtual DOM</td><td>Copia en memoria del DOM que React usa para actualizar solo lo que cambió</td></tr>
+          <tr><td>export default</td><td>Marca qué function de un archivo puede ser importada desde otro</td></tr>
+          <tr><td>import ... from</td><td>Trae un componente exportado desde otro archivo, para usarlo aquí</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <span class="slide-num-badge">12 / 14</span>
+</section>
+
+<!-- ══════════ SLIDE 13 — resumen visual (placeholder para consistencia con S20) ══════════ -->
+<section class="slide bg-teal" id="resumen-visual">
+  <div class="slide-inner">
+    <div class="sec-header">
+      <span class="sec-tag teal">En resumen</span>
+      <h2 class="sec-titulo">De un archivo a dos componentes conectados</h2>
+      <p class="sec-desc">El mismo resultado visual de siempre — el cambio es de organización del código, no de diseño.</p>
+    </div>
+
+    <div class="dom-compare" style="grid-template-columns:1fr auto 1fr;">
+      <div class="dom-box mal">
+        <div class="dom-box-title">📄 Antes (S19-S20)</div>
+        <div class="dom-box-desc"><code style="font-family:'JetBrains Mono',monospace;font-size:12px;">App.jsx</code> — 1 archivo con todo: navbar + catálogo + footer, todo en el mismo <code style="font-family:'JetBrains Mono',monospace;font-size:12px;">return</code>.</div>
+      </div>
+      <div class="dom-vs">→</div>
+      <div class="dom-box bien">
+        <div class="dom-box-title">🧩 Después de hoy</div>
+        <div class="dom-box-desc"><code style="font-family:'JetBrains Mono',monospace;font-size:12px;">Navbar.jsx</code> — componente propio.<br><code style="font-family:'JetBrains Mono',monospace;font-size:12px;">App.jsx</code> — usa <code style="font-family:'JetBrains Mono',monospace;font-size:12px;">&lt;Navbar /&gt;</code> + el resto del contenido.</div>
+      </div>
+    </div>
+  </div>
+  <span class="slide-num-badge">13 / 14</span>
+</section>
+
+<!-- ══════════ SLIDE 14 — ENTREGABLE ══════════ -->
+<section class="slide bg-verde" id="entregable">
+  <div class="bg-dots"></div>
+  <div class="slide-inner">
+    <div class="sec-header">
+      <span class="sec-tag verde">Cierre · Sesión 21</span>
+      <h2 class="sec-titulo">¡Empezamos!</h2>
+    </div>
+
+    <div class="entregable-box">
+      <div class="entregable-title">Criterios de evaluación</div>
+      <ul class="entregable-list">
+        <li>src/Navbar.jsx creado como componente propio, con export default</li>
+        <li>App.jsx importa Navbar.jsx y lo usa como &lt;Navbar /&gt;</li>
+        <li>El navbar se ve exactamente igual que antes — mismo diseño, mismo código Tailwind</li>
+        <li>Catálogo de productos y footer de S19-S20 siguen funcionando sin cambios</li>
+        <li>Sin errores en la consola del navegador ni en la terminal de Vite</li>
+        <li>Probado en localhost:5173 con recarga en vivo funcionando</li>
+      </ul>
+    </div>
+
+    <div class="concepto-grid" style="margin-top:24px;">
+      <div class="concepto-card azul">
+        <div class="concepto-icon">📖</div>
+        <div class="concepto-titulo">02 — Guía paso a paso</div>
+        <div class="concepto-desc">La parte <strong>obligatoria</strong> de hoy: crear Navbar.jsx, exportarlo, importarlo y usarlo en App.jsx.</div>
+        <a href="#" style="display:inline-block;margin-top:10px;color:#1e40af;font-weight:700;text-decoration:underline;font-size:13px;">Abrir guía →</a>
+      </div>
+      <div class="concepto-card teal">
+        <div class="concepto-icon">✏️</div>
+        <div class="concepto-titulo">03 — Ejercicios de práctica</div>
+        <div class="concepto-desc"><strong>Opcional</strong> — solo si sobra tiempo después de terminar la guía 02. Refuerzo de componentes.</div>
+        <a href="#" style="display:inline-block;margin-top:10px;color:#0369a1;font-weight:700;text-decoration:underline;font-size:13px;">Abrir ejercicios →</a>
+      </div>
+    </div>
+
+    <div class="info-box teal" style="margin-top:20px;">
+      <div class="info-box-title">Próxima sesión — S22</div>
+      <div class="info-box-content">Props y composición de componentes: pasar datos entre componentes, renderizar listas con <code style="font-family:'JetBrains Mono',monospace;font-size:12px;">.map()</code> y <code style="font-family:'JetBrains Mono',monospace;font-size:12px;">key</code>, construir <code style="font-family:'JetBrains Mono',monospace;font-size:12px;">&lt;ProductCard /&gt;</code> reutilizable a partir de props.</div>
+    </div>
+  </div>
+  <span class="slide-num-badge">14 / 14</span>
+</section>
+
+<!-- ── FOOTER NAV FIJO ── -->
+<nav class="footer-nav">
+  <button class="footer-btn" id="btn-prev" onclick="navSlide(-1)" disabled>← Anterior</button>
+  <span class="footer-page" id="footer-page">Slide 1 de 13</span>
+  <button class="footer-btn" id="btn-next" onclick="navSlide(1)">Siguiente →</button>
+</nav>
+
+<script>
+document.addEventListener('contextmenu', e => e.preventDefault());
+
+const slides = Array.from(document.querySelectorAll('.slide'));
+let current = 0;
+const btnPrev = document.getElementById('btn-prev');
+const btnNext = document.getElementById('btn-next');
+const pageLabel = document.getElementById('footer-page');
+
+function updateNav() {
+  btnPrev.disabled = current === 0;
+  btnNext.disabled = current === slides.length - 1;
+  pageLabel.textContent = 'Slide ' + (current + 1) + ' de ' + slides.length;
+}
+
+function navSlide(dir) {
+  current = Math.max(0, Math.min(slides.length - 1, current + dir));
+  slides[current].scrollIntoView({ behavior: 'smooth' });
+  updateNav();
+}
+
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      current = slides.indexOf(e.target);
+      updateNav();
+    }
+  });
+}, { threshold: 0.5 });
+slides.forEach(s => observer.observe(s));
+
+updateNav();
+</script>
+</body>
+</html>
